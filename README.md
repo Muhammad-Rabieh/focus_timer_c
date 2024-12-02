@@ -10,33 +10,43 @@ A simple GTK-based focus timer application with sound notification.
 - Automatic timer restart
 - Time display in minutes:seconds format
 
-## Dependencies
+## Installation
 
-The application requires GTK3 and ALSA development libraries.
+### Automatic Installation (Recommended)
+```bash
+./install.sh
+```
+This script will:
+1. Detect your Linux distribution
+2. Install required dependencies
+3. Compile the program
+4. Test the sound system
 
-### Ubuntu/Debian
+### Manual Installation
+
+If you prefer to install manually, you'll need these dependencies:
+
+#### Ubuntu/Debian
 ```bash
 sudo apt-get install libgtk-3-dev libasound2-dev build-essential
 ```
 
-### Fedora
+#### Fedora
 ```bash
 sudo dnf install gtk3-devel alsa-lib-devel gcc
 ```
 
-### Arch Linux
+#### Arch Linux
 ```bash
 sudo pacman -S gtk3 alsa-lib base-devel
 ```
 
-### openSUSE
+#### openSUSE
 ```bash
 sudo zypper install gtk3-devel alsa-devel gcc
 ```
 
-## Building
-
-After installing the dependencies, compile the program:
+Then compile manually:
 ```bash
 gcc -o focus_timer focus_timer.c $(pkg-config --cflags --libs gtk+-3.0) -lasound -lm
 ```
