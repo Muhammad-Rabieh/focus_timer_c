@@ -1,0 +1,18 @@
+# Compiled binary
+focus_timer
+
+# Object files
+*.o
+
+# Editor backup files
+*~
+*.swp
+
+# Build directories
+build/
+dist/
+
+# OS specific files
+.DS_Store
+.directory
+Thumbs.db
