@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <alsa/asoundlib.h>
 #include <math.h>
+#include <gdk-pixbuf/gdk-pixbuf.h>
 
 // Configuration constants
 #define SAMPLE_RATE 44100
@@ -12,7 +13,7 @@
 #define MIN_TIMER_SECONDS 1
 #define MAX_TIMER_SECONDS 3600
 #define WINDOW_WIDTH 300
-#define WINDOW_HEIGHT 150
+#define WINDOW_HEIGHT 200
 #define UPDATE_INTERVAL_MS 1000
 
 typedef struct {
@@ -20,6 +21,7 @@ typedef struct {
     GtkWidget *entry;
     GtkWidget *label;
     GtkWidget *button;
+    GtkWidget *volume_slider;
     guint timer_id;
     int remaining_time;
     gboolean is_running;
@@ -83,10 +85,14 @@ static void play_beep(void) {
         return;
     }
 
+    // Get volume from slider
+    int volume = gtk_range_get_value(GTK_RANGE(app.volume_slider));
+    double volume_factor = (double)volume / 100.0;
+
     // Generate sine wave
     for (int i = 0; i < samples; i++) {
         double t = (double)i / SAMPLE_RATE;
-        buffer[i] = 32767.0 * sin(2.0 * M_PI * FREQUENCY * t);
+        buffer[i] = (short)(32767.0 * sin(2.0 * M_PI * FREQUENCY * t) * volume_factor);
     }
     
     // Play sound
@@ -169,7 +175,8 @@ static void setup_css(void) {
     const char *css =
         "entry { font-size: 14px; padding: 5px; }"
         "label { font-size: 16px; padding: 5px; }"
-        "button { font-size: 14px; padding: 8px 16px; }";
+        "button { font-size: 14px; padding: 8px 16px; }"
+        "scale { padding: 5px; }";
     
     gtk_css_provider_load_from_data(app.css_provider, css, -1, NULL);
     gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
@@ -190,6 +197,18 @@ static void activate(GtkApplication *app_gtk, gpointer user_data) {
     // Create window
     app.window = gtk_application_window_new(app_gtk);
     gtk_window_set_title(GTK_WINDOW(app.window), "Focus Timer");
+    
+    // Load the application icon
+    GError *error = NULL;
+    GdkPixbuf *icon = gdk_pixbuf_new_from_file("assets/icons/alarm-clock.png", &error);
+    if (error != NULL) {
+        g_print("Error loading icon: %s\n", error->message);
+        g_error_free(error);
+    } else {
+        gtk_window_set_icon(GTK_WINDOW(app.window), icon);
+        g_object_unref(icon);
+    }
+    
     gtk_window_set_default_size(GTK_WINDOW(app.window), WINDOW_WIDTH, WINDOW_HEIGHT);
     gtk_container_set_border_width(GTK_CONTAINER(app.window), 10);
     
@@ -209,6 +228,13 @@ static void activate(GtkApplication *app_gtk, gpointer user_data) {
     app.label = gtk_label_new(NULL);
     update_label();
     gtk_box_pack_start(GTK_BOX(box), app.label, FALSE, FALSE, 0);
+    
+    // Create volume slider
+    app.volume_slider = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 0, 100, 1);
+    gtk_scale_set_value_pos(GTK_SCALE(app.volume_slider), GTK_POS_RIGHT);
+    gtk_box_pack_start(GTK_BOX(box), app.volume_slider, FALSE, FALSE, 0);
+    gtk_widget_set_valign(app.volume_slider, GTK_ALIGN_CENTER);
+    gtk_widget_show(app.volume_slider);
     
     // Create start/stop button
     app.button = gtk_button_new_with_label("Start");
