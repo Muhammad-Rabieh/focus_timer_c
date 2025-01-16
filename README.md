@@ -38,3 +38,21 @@ Adjust the timer duration in seconds.
 Use the volume control slider to set the desired notification volume.
 Click "Start" to begin the timer.
 
+## Cloning and Building
+
+To clone and build the project, follow these steps:
+
+1.  Clone the repository:
+    ```bash
+    git clone [repository URL]
+    cd focus-timer
+    ```
+2.  Run the install script:
+    ```bash
+    ./install.sh
+    ```
+3.  Run the application:
+    ```bash
+    ./focus_timer
+    ```
+
