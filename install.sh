@@ -78,3 +78,30 @@ if [ $? -ne 0 ]; then
 else
     echo -e "${GREEN}Sound system test passed${NC}"
 fi
+
+
+# Copy icons
+cp assets/icons/focus_timer.png ~/.local/share/icons/hicolor/128x128/apps/focus_timer.png
+cp assets/icons/focus_timer.png ~/.local/share/icons/hicolor/64x64/apps/focus_timer.png
+cp assets/icons/focus_timer.png ~/.local/share/icons/hicolor/48x48/apps/focus_timer.png
+cp assets/icons/focus_timer.png ~/.local/share/icons/hicolor/32x32/apps/focus_timer.png
+cp assets/icons/focus_timer.png ~/.local/share/icons/hicolor/16x16/apps/focus_timer.png
+
+# Create desktop entry
+DESKTOP_FILE="$HOME/.local/share/applications/focus_timer.desktop"
+cat << EOF > "$DESKTOP_FILE"
+[Desktop Entry]
+Name=Focus Timer
+Comment=A simple focus timer application
+Exec=$PWD/focus_timer
+Icon=focus_timer
+Terminal=false
+Type=Application
+Categories=Utility;
+EOF
+
+# Update icon cache
+gtk-update-icon-cache ~/.local/share/icons/hicolor -f
+
+# Update desktop database
+update-desktop-database ~/.local/share/applications/
