@@ -1,10 +1,9 @@
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <alsa/asoundlib.h>
 #include <math.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
-
-// Dependency: aplay
 
 // Configuration constants
 #define SAMPLE_RATE 44100
@@ -33,7 +32,7 @@ static App app = {0};  // Zero-initialize all members
 
 // Function declarations
 static void show_error_dialog(const char *message);
-static void play_audio_file(const char *filename);
+static void play_beep(void);
 static void update_label(void);
 static int validate_time_input(const char *text);
 static gboolean timer_tick(gpointer data);
@@ -53,12 +52,58 @@ static void show_error_dialog(const char *message) {
     gtk_widget_destroy(dialog);
 }
 
-static void play_audio_file(const char *filename) {
-    char command[256];
-    snprintf(command, sizeof(command), "aplay %s", filename);
-    if (system(command) != 0) {
-        g_warning("Failed to play audio file: %s\n", filename);
+static void play_beep(void) {
+    snd_pcm_t *handle;
+    int err;
+    
+    if ((err = snd_pcm_open(&handle, "default", SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
+        g_warning("Cannot open audio device: %s\n", snd_strerror(err));
+        return;
     }
+
+    err = snd_pcm_set_params(handle,
+                            SND_PCM_FORMAT_S16_LE,
+                            SND_PCM_ACCESS_RW_INTERLEAVED,
+                            1,  // mono
+                            SAMPLE_RATE,
+                            1,  // allow resampling
+                            500000);  // 0.5s latency
+    
+    if (err < 0) {
+        g_warning("Cannot set audio parameters: %s\n", snd_strerror(err));
+        snd_pcm_close(handle);
+        return;
+    }
+
+    // Generate samples
+    int samples = (SAMPLE_RATE * DURATION_MS) / 1000;
+    short *buffer = g_malloc(samples * sizeof(short));
+    
+    if (!buffer) {
+        g_warning("Cannot allocate memory for audio buffer\n");
+        snd_pcm_close(handle);
+        return;
+    }
+
+    // Get volume from slider
+    int volume = gtk_range_get_value(GTK_RANGE(app.volume_slider));
+    double volume_factor = (double)volume / 100.0;
+
+    // Generate sine wave
+    for (int i = 0; i < samples; i++) {
+        double t = (double)i / SAMPLE_RATE;
+        buffer[i] = (short)(32767.0 * sin(2.0 * M_PI * FREQUENCY * t) * volume_factor);
+    }
+    
+    // Play sound
+    if ((err = snd_pcm_writei(handle, buffer, samples)) < 0) {
+        g_warning("Write error: %s\n", snd_strerror(err));
+    }
+    
+    // Cleanup
+    g_free(buffer);
+    snd_pcm_drain(handle);
+    snd_pcm_close(handle);
 }
 
 static void update_label(void) {
@@ -96,7 +141,7 @@ static gboolean timer_tick(gpointer data) {
         app.remaining_time--;
         update_label();
     } else {
-        play_audio_file("assets/audio/Alarm_Clock_Beep.mp3");
+        play_beep();
         // Get duration from entry
         const char *text = gtk_entry_get_text(GTK_ENTRY(app.entry));
         app.remaining_time = validate_time_input(text);
