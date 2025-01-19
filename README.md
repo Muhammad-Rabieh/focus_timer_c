@@ -2,6 +2,8 @@
 
 A simple GTK-based focus timer application with sound notification.
 
+![Screenshot](./assets/images/Screenshot_2025-01-19_11-05-17.png)
+
 ## Features
 - Simple and clean GTK3 interface
 - Customizable timer duration
