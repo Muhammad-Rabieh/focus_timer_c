@@ -1,4 +1,4 @@
-# Focus Timer
+# Focus Timer ![Logo](./assets/icons/focus_timer.png)
 
 A simple GTK-based focus timer application with sound notification.
 
