@@ -1,4 +1,4 @@
-# Focus Timer ![Logo](./assets/icons/focus_timer.png)
+# Focus Timer <img src="./assets/icons/focus_timer.png" alt="Logo" style="width: 30px; height: auto;">
 
 A simple GTK-based focus timer application with sound notification.
 
