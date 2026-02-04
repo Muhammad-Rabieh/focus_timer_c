@@ -11,7 +11,7 @@ echo "======================================"
 
 # Configuration
 PACKAGE_NAME="focus-timer"
-VERSION="1.0.0"
+VERSION="0.16.0"
 MAINTAINER="Muhammad Rabieh <Muhammad.Rabieh@gmail.com>"
 DESCRIPTION="A simple GTK-based focus timer application"
 ARCH=$(dpkg --print-architecture)

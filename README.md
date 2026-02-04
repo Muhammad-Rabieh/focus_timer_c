@@ -44,7 +44,7 @@ To create a `.deb` package for easy installation and distribution on Debian-base
     ```
 2.  Install the generated package:
     ```bash
-    sudo dpkg -i focus-timer_1.0.0_amd64.deb
+    sudo dpkg -i focus-timer_0.16.0_amd64.deb
     ```
 
 ## Uninstallation
