@@ -35,6 +35,11 @@ After installation, you can run the Focus Timer using:
 
 ./focus_timer
 
+## Uninstallation
+If you wish to remove the program, icons, and desktop entry, run the uninstallation script:
+
+./uninstall.sh
+
 ## Usage
 Adjust the timer duration in seconds.
 Use the volume control slider to set the desired notification volume.
