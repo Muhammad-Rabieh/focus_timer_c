@@ -17,3 +17,7 @@ dist/
 .directory
 Thumbs.db
 .aider*
+
+# Debian build files
+focus-timer-pkg/
+*.deb

@@ -35,10 +35,26 @@ After installation, you can run the Focus Timer using:
 
 ./focus_timer
 
-## Uninstallation
-If you wish to remove the program, icons, and desktop entry, run the uninstallation script:
+## Debian Package
+To create a `.deb` package for easy installation and distribution on Debian-based systems (like Ubuntu):
 
+1.  Run the build script:
+    ```bash
+    ./build_deb.sh
+    ```
+2.  Install the generated package:
+    ```bash
+    sudo dpkg -i focus-timer_1.0.0_amd64.deb
+    ```
+
+## Uninstallation
+If you installed via the source script, use:
 ./uninstall.sh
+
+If you installed via the `.deb` package, use:
+```bash
+sudo apt remove focus-timer
+```
 
 ## Usage
 Adjust the timer duration in seconds.
