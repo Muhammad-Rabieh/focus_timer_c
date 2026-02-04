@@ -80,16 +80,27 @@ else
 fi
 
 
+# Create icon directories if they don't exist
+echo -e "${YELLOW}Installing application icons...${NC}"
+mkdir -p ~/.local/share/icons/hicolor/{16x16,32x32,48x48,64x64,128x128}/apps
+
 # Copy icons
-cp assets/icons/focus_timer.png ~/.local/share/icons/hicolor/128x128/apps/focus_timer.png
-cp assets/icons/focus_timer.png ~/.local/share/icons/hicolor/64x64/apps/focus_timer.png
-cp assets/icons/focus_timer.png ~/.local/share/icons/hicolor/48x48/apps/focus_timer.png
-cp assets/icons/focus_timer.png ~/.local/share/icons/hicolor/32x32/apps/focus_timer.png
-cp assets/icons/focus_timer.png ~/.local/share/icons/hicolor/16x16/apps/focus_timer.png
+if [ -f "assets/icons/focus_timer.png" ]; then
+    cp assets/icons/focus_timer.png ~/.local/share/icons/hicolor/128x128/apps/focus_timer.png
+    cp assets/icons/focus_timer.png ~/.local/share/icons/hicolor/64x64/apps/focus_timer.png
+    cp assets/icons/focus_timer.png ~/.local/share/icons/hicolor/48x48/apps/focus_timer.png
+    cp assets/icons/focus_timer.png ~/.local/share/icons/hicolor/32x32/apps/focus_timer.png
+    cp assets/icons/focus_timer.png ~/.local/share/icons/hicolor/16x16/apps/focus_timer.png
+    echo -e "${GREEN}Icons installed successfully${NC}"
+else
+    echo -e "${RED}Warning: Icon file not found at assets/icons/focus_timer.png${NC}"
+fi
 
 # Create desktop entry
+echo -e "${YELLOW}Creating desktop entry...${NC}"
+mkdir -p "$HOME/.local/share/applications"
 DESKTOP_FILE="$HOME/.local/share/applications/focus_timer.desktop"
-cat << EOF > "$DESKTOP_FILE"
+cat <<EOF > "$DESKTOP_FILE"
 [Desktop Entry]
 Name=Focus Timer
 Comment=A simple focus timer application
@@ -100,8 +111,39 @@ Type=Application
 Categories=Utility;
 EOF
 
+if [ -f "$DESKTOP_FILE" ]; then
+    chmod +x "$DESKTOP_FILE"
+    echo -e "${GREEN}Desktop entry created successfully${NC}"
+else
+    echo -e "${RED}Warning: Failed to create desktop entry${NC}"
+fi
+
 # Update icon cache
-gtk-update-icon-cache ~/.local/share/icons/hicolor -f
+echo -e "${YELLOW}Updating icon cache...${NC}"
+if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+    gtk-update-icon-cache ~/.local/share/icons/hicolor -f 2>/dev/null || echo -e "${YELLOW}Note: Icon cache update had warnings (this is usually fine)${NC}"
+else
+    echo -e "${YELLOW}Note: gtk-update-icon-cache not found, icons may require logout/login to appear${NC}"
+fi
 
 # Update desktop database
-update-desktop-database ~/.local/share/applications/
+echo -e "${YELLOW}Updating desktop database...${NC}"
+if command -v update-desktop-database >/dev/null 2>&1; then
+    update-desktop-database ~/.local/share/applications/ 2>/dev/null || echo -e "${YELLOW}Note: Desktop database update had warnings (this is usually fine)${NC}"
+else
+    echo -e "${YELLOW}Note: update-desktop-database not found, you may need to logout/login for menu entry to appear${NC}"
+fi
+
+echo ""
+echo -e "${GREEN}========================================${NC}"
+echo -e "${GREEN}Installation Complete!${NC}"
+echo -e "${GREEN}========================================${NC}"
+echo ""
+echo "You can now:"
+echo "  1. Run from terminal: ./focus_timer"
+echo "  2. Find 'Focus Timer' in your application menu"
+echo "  3. Add to desktop or favorites"
+echo ""
+echo -e "${YELLOW}Note: If icons don't appear immediately, try:${NC}"
+echo "  - Logging out and back in"
+echo "  - Running: gtk-update-icon-cache ~/.local/share/icons/hicolor -f"
